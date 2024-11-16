@@ -696,6 +696,7 @@ export const deletePipeline = async (pipelineId: string) => {
   return response;
 };
 
+// {/* ========== Create & Update Lane ========== */}
 export const upsertLane = async (lane: Prisma.LaneUncheckedCreateInput) => {
   let order: number;
 
@@ -720,11 +721,13 @@ export const upsertLane = async (lane: Prisma.LaneUncheckedCreateInput) => {
   return response;
 };
 
+// {/* ========== Delete Lane ========== */}
 export const deleteLane = async (laneId: string) => {
   const resposne = await db.lane.delete({ where: { id: laneId } });
   return resposne;
 };
 
+// {/* ========== Get Ticket with Tags ========== */}
 export const getTicketsWithTags = async (pipelineId: string) => {
   const response = await db.ticket.findMany({
     where: {
@@ -737,6 +740,7 @@ export const getTicketsWithTags = async (pipelineId: string) => {
   return response;
 };
 
+// {/* ========== Get Ticket with All Relation (just for Type Peropse) ========== */}
 export const _getTicketsWithAllRelations = async (laneId: string) => {
   const response = await db.ticket.findMany({
     where: { laneId: laneId },
@@ -750,6 +754,7 @@ export const _getTicketsWithAllRelations = async (laneId: string) => {
   return response;
 };
 
+// {/* ========== Get Sub Account Team Members ========== */}
 export const getSubAccountTeamMembers = async (subaccountId: string) => {
   const subaccountUsersWithAccess = await db.user.findMany({
     where: {
@@ -772,6 +777,7 @@ export const getSubAccountTeamMembers = async (subaccountId: string) => {
   return subaccountUsersWithAccess;
 };
 
+// {/* ========== Search Contacts ========== */}
 export const searchContacts = async (searchTerms: string) => {
   const response = await db.contact.findMany({
     where: {
@@ -783,6 +789,7 @@ export const searchContacts = async (searchTerms: string) => {
   return response;
 };
 
+// {/* ========== Create & Update Ticket ========== */}
 export const upsertTicket = async (
   ticket: Prisma.TicketUncheckedCreateInput,
   tags: Tag[]
@@ -814,6 +821,7 @@ export const upsertTicket = async (
   return response;
 };
 
+// {/* ========== Delete Ticket ========== */}
 export const deleteTicket = async (ticketId: string) => {
   const response = await db.ticket.delete({
     where: {
@@ -824,6 +832,7 @@ export const deleteTicket = async (ticketId: string) => {
   return response;
 };
 
+// {/* ========== Upsert Ticket ========== */}
 export const upsertTag = async (
   subaccountId: string,
   tag: Prisma.TagUncheckedCreateInput
@@ -837,6 +846,7 @@ export const upsertTag = async (
   return response;
 };
 
+// {/* ========== Get Tags for subaccount ========== */}
 export const getTagsForSubaccount = async (subaccountId: string) => {
   const response = await db.subAccount.findUnique({
     where: { id: subaccountId },
@@ -845,6 +855,7 @@ export const getTagsForSubaccount = async (subaccountId: string) => {
   return response;
 };
 
+// {/* ========== Delete Tags ========== */}
 export const deleteTag = async (tagId: string) => {
   const response = await db.tag.delete({ where: { id: tagId } });
   return response;

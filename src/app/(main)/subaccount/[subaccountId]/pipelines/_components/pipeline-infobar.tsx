@@ -68,40 +68,42 @@ export const PipelineInfoBar = ({
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
             <Command>
-              <CommandEmpty>No pipelines found.</CommandEmpty>
-              <CommandGroup>
-                {pipelines.map((pipeline) => (
-                  <Link
-                    key={pipeline.id}
-                    href={`/subaccount/${subAccountId}/pipelines/${pipeline.id}`}
-                  >
-                    <CommandItem
+              <CommandList>
+                <CommandEmpty>No pipelines found.</CommandEmpty>
+                <CommandGroup>
+                  {pipelines.map((pipeline) => (
+                    <Link
                       key={pipeline.id}
-                      value={pipeline.id}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue);
-                        setOpen(false);
-                      }}
+                      href={`/subaccount/${subAccountId}/pipelines/${pipeline.id}`}
                     >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === pipeline.id ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {pipeline.name}
-                    </CommandItem>
-                  </Link>
-                ))}
-                <Button
-                  variant="secondary"
-                  className="flex gap-2 w-full mt-4"
-                  onClick={handleClickCreatePipeline}
-                >
-                  <Plus size={15} />
-                  Create Pipeline
-                </Button>
-              </CommandGroup>
+                      <CommandItem
+                        key={pipeline.id}
+                        value={pipeline.id}
+                        onSelect={(currentValue) => {
+                          setValue(currentValue);
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            value === pipeline.id ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {pipeline.name}
+                      </CommandItem>
+                    </Link>
+                  ))}
+                  <Button
+                    variant="secondary"
+                    className="flex gap-2 w-full mt-4"
+                    onClick={handleClickCreatePipeline}
+                  >
+                    <Plus size={15} />
+                    Create Pipeline
+                  </Button>
+                </CommandGroup>
+              </CommandList>
             </Command>
           </PopoverContent>
         </Popover>

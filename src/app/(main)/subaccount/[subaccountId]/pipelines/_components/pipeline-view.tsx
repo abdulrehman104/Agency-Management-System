@@ -153,11 +153,11 @@ export const PipelineView = ({
         >
           {(provided) => (
             <div
-              className="flex item-center gap-x-2"
+              className="flex item-center gap-x-2 overflow-scroll"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              <div className="flex mt-4">
+              <div className="flex mt-4 ">
                 {allLanes.map((lane, index) => (
                   <PipelineLane
                     allTickets={allTickets}
