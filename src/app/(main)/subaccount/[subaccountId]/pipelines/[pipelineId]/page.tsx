@@ -1,4 +1,10 @@
-import db from "@/lib/db";
+import { redirect } from "next/navigation";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PipelineInfoBar } from "../_components/pipeline-infobar";
+import { PipelineSettings } from "../_components/pipeline-settings";
+import { PipelineView } from "../_components/pipeline-view";
+
 import {
   getLanesWithTicketAndTags,
   getPipelineDetails,
@@ -6,26 +12,25 @@ import {
   updateTicketsOrder,
 } from "@/lib/queries";
 import { LaneDetail } from "@/lib/types";
-import { redirect } from "next/navigation";
-import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PipelineInfoBar } from "../_components/pipeline-infobar";
-import { PipelineSettings } from "../_components/pipeline-settings";
-import { PipelineView } from "../_components/pipeline-view";
+import db from "@/lib/db";
 
 type Props = {
   params: { subaccountId: string; pipelineId: string };
 };
 
 export default async function PiplinePage({ params }: Props) {
+  // {/* ========== Get pipline in the DB ========== */}
   const pipelineDetails = await getPipelineDetails(params.pipelineId);
+
   if (!pipelineDetails)
     return redirect(`/subaccount/${params.subaccountId}/pipelines`);
 
+  // {/* ========== Get All piplines in the DB related to this subaccountId ========== */}
   const pipelines = await db.pipeline.findMany({
     where: { subAccountId: params.subaccountId },
   });
 
+  // {/* ========== Get all lanes with Ticker and tags ========== */}
   const lanes = (await getLanesWithTicketAndTags(
     params.pipelineId
   )) as LaneDetail[];
@@ -33,6 +38,8 @@ export default async function PiplinePage({ params }: Props) {
   return (
     <Tabs defaultValue="view" className="w-full">
       <TabsList className="bg-transparent border-b-2 h-16 w-full justify-between mb-4">
+        
+        {/* ========== Pipline Information Bar ========== */}
         <PipelineInfoBar
           pipelineId={params.pipelineId}
           subAccountId={params.subaccountId}
@@ -43,6 +50,8 @@ export default async function PiplinePage({ params }: Props) {
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </div>
       </TabsList>
+
+      {/* ========== Pipline View ========== */}
       <TabsContent value="view">
         <PipelineView
           lanes={lanes}
@@ -53,6 +62,8 @@ export default async function PiplinePage({ params }: Props) {
           updateTicketsOrder={updateTicketsOrder}
         />
       </TabsContent>
+
+      {/* ========== Pipline Setting ========== */}
       <TabsContent value="settings">
         <PipelineSettings
           pipelineId={params.pipelineId}

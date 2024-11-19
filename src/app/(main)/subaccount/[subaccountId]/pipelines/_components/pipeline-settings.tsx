@@ -1,6 +1,9 @@
 "use client";
 
-import { CreatePipelineForm } from "@/components/forms/create-pipline-forms";
+import { Pipeline } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import React from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,11 +16,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { CreatePipelineForm } from "@/components/forms/create-pipline-forms";
 import { deletePipeline, saveActivityLogsNotification } from "@/lib/queries";
-import { Pipeline } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import React from "react";
+import { toast } from "@/hooks/use-toast";
 
 export const PipelineSettings = ({
   pipelineId,
@@ -30,6 +31,7 @@ export const PipelineSettings = ({
 }) => {
   const router = useRouter();
 
+  // {/* ========== Delete Pipline in the DB ========== */}
   const onDelete = async () => {
     try {
       await deletePipeline(pipelineId);

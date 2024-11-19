@@ -1,20 +1,21 @@
 "use client";
+import React, { useEffect, useState } from "react";
+import { Flag, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Lane, Ticket } from "@prisma/client";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 
+import { useModal } from "@/provider/modal-provider";
 import { LaneForm } from "@/components/forms/create-lane-form";
 import { CustomModal } from "@/components/global/custom-modal";
 import { Button } from "@/components/ui/button";
+import { PipelineLane } from "./pipeline-lane";
 import {
   LaneDetail,
   PipelineDetailsWithLanesCardsTagsTickets,
   TicketAndTags,
 } from "@/lib/types";
-import { useModal } from "@/provider/modal-provider";
-import { Lane, Ticket } from "@prisma/client";
-import { Flag, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
-import { PipelineLane } from "./pipeline-lane";
+
 
 type Props = {
   lanes: LaneDetail[];
@@ -41,6 +42,7 @@ export const PipelineView = ({
     setAllLanes(lanes);
   }, [lanes]);
 
+  // {/* ========== Tickets in All Lane ========== */}
   const ticketsFromAllLanes: TicketAndTags[] = [];
   lanes.forEach((item) => {
     item.Tickets.forEach((i) => {
@@ -49,6 +51,7 @@ export const PipelineView = ({
   });
   const [allTickets, setAllTickets] = useState(ticketsFromAllLanes);
 
+  // {/* ========== Add Pipline in the DB ========== */}
   const handleAddLane = () => {
     setOpen(
       <CustomModal
@@ -60,6 +63,7 @@ export const PipelineView = ({
     );
   };
 
+  // {/* ========== Drag & Drop Lane ro Ticket ========== */}
   const onDragEnd = (dropResult: DropResult) => {
     console.log(dropResult);
     const { destination, source, type } = dropResult;

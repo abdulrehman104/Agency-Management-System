@@ -73,6 +73,7 @@ export const PipelineLane: React.FC<PipelaneLaneProps> = ({
     setAllTickets([...allTickets, ticket]);
   };
 
+  // {/* ========== Create New Ticket in DB========== */}
   const handleCreateTicket = () => {
     setOpen(
       <CustomModal
@@ -88,6 +89,7 @@ export const PipelineLane: React.FC<PipelaneLaneProps> = ({
     );
   };
 
+  // {/* ========== Edit Lane ========== */}
   const handleEditLane = () => {
     setOpen(
       <CustomModal title="Edit Lane Details" description="">
@@ -96,6 +98,7 @@ export const PipelineLane: React.FC<PipelaneLaneProps> = ({
     );
   };
 
+  // {/* ========== Delete Lane ========== */}
   const handleDeleteLane = async () => {
     try {
       const response = await deleteLane(laneDetails.id);

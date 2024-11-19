@@ -7,15 +7,19 @@ type Props = {
 };
 
 export default async function pipelines({ params }: Props) {
+
+// {/* ========== Get Pipline in DB ========== */}
   const pipelineExists = await db.pipeline.findFirst({
     where: { subAccountId: params.subaccountId },
   });
 
+// {/* ========== Pipline Exists redirect to Pipline ========== */}
   if (pipelineExists)
     return redirect(
       `/subaccount/${params.subaccountId}/pipelines/${pipelineExists.id}`
     );
 
+// {/* ========== Pipline not Exists create new Pipline ========== */}
   try {
     const response = await db.pipeline.create({
       data: { name: "First Pipeline", subAccountId: params.subaccountId },

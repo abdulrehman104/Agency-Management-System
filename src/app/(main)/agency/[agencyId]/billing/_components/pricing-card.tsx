@@ -81,7 +81,7 @@ export const PricingCard = ({
             </small>
           </p>
         </CardHeader>
-        <CardContent>
+        {/* <CardContent>
           <ul>
             {features.map((feature) => (
               <li
@@ -92,7 +92,7 @@ export const PricingCard = ({
               </li>
             ))}
           </ul>
-        </CardContent>
+        </CardContent> */}
       </div>
       <CardFooter>
         <Card className="w-full">

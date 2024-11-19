@@ -1,4 +1,5 @@
-import { Separator } from "@/components/ui/separator";
+import clsx from "clsx";
+
 import {
   Table,
   TableBody,
@@ -7,12 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { addOnProducts, pricingCards } from "@/lib/constants";
-import db from "@/lib/db";
-import { stripe } from "@/lib/stripe";
-import clsx from "clsx";
+import { Separator } from "@/components/ui/separator";
 import { SubscriptionHelper } from "./_components/subscription-helper";
 import { PricingCard } from "./_components/pricing-card";
+
+import { addOnProducts, pricingCards } from "@/lib/constants";
+import { stripe } from "@/lib/stripe";
+import db from "@/lib/db";
 
 type Props = {
   params: { agencyId: string };
