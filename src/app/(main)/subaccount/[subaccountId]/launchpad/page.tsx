@@ -10,13 +10,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+import { getStripeOAuthLink } from "@/lib/utils";
 import db from "@/lib/db";
+import { stripe } from "@/lib/stripe";
+
 
 type Props = {
   params: { subaccountId: string };
+  searchParams: { code: string };
 };
 
-export default async function LaunchpadPage({ params }: Props) {
+export default async function LaunchpadPage({ params, searchParams }: Props) {
   const subaccountDetails = await db.subAccount.findUnique({
     where: { id: params.subaccountId },
   });
@@ -32,6 +37,31 @@ export default async function LaunchpadPage({ params }: Props) {
     subaccountDetails.country &&
     subaccountDetails.name &&
     subaccountDetails.state;
+
+    const stripeOAuthLink = getStripeOAuthLink(
+      'subaccount',
+      `launchpad___${subaccountDetails.id}`
+    )
+  
+    let connectedStripeAccount = false
+  
+    if (searchParams.code) {
+      if (!subaccountDetails.connectAccountId) {
+        try {
+          const response = await stripe.oauth.token({
+            grant_type: 'authorization_code',
+            code: searchParams.code,
+          })
+          await db.subAccount.update({
+            where: { id: params.subaccountId },
+            data: { connectAccountId: response.stripe_user_id },
+          })
+          connectedStripeAccount = true
+        } catch (error) {
+          console.log('🔴 Could not connect stripe account', error)
+        }
+      }
+    }
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -59,7 +89,20 @@ export default async function LaunchpadPage({ params }: Props) {
                 />
                 <p> Save the website as a shortcut on your mobile device</p>
               </div>
-              <Button>Start</Button>
+              {subaccountDetails.connectAccountId ||
+                connectedStripeAccount ? (
+                  <CheckCircleIcon
+                    size={50}
+                    className=" text-primary p-2 flex-shrink-0"
+                  />
+                ) : (
+                  <Link
+                    className="bg-primary py-2 px-4 rounded-md text-white"
+                    href={stripeOAuthLink}
+                  >
+                    Start
+                  </Link>
+                )}
             </div>
 
             {/* ========== Stripe Integration Step ========== */}

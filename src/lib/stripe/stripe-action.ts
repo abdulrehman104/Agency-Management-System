@@ -1,8 +1,8 @@
 "use server";
 
 import Stripe from "stripe";
-import { db } from "../db";
 import { stripe } from ".";
+import db from "../db";
 
 export const subscriptionCreated = async (
   subscription: Stripe.Subscription,

@@ -2,14 +2,24 @@ import { CheckCircleIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+import { getStripeOAuthLink } from "@/lib/utils";
 import db from "@/lib/db";
+import { stripe } from "@/lib/stripe";
 
 type Props = {
   params: { agencyId: string };
+  searchParams: { code: string };
 };
-export default async function LaunchPage({ params }: Props) {
+export default async function LaunchPage({ params, searchParams }: Props) {
   const agencyDetails = await db.agency.findUnique({
     where: { id: params.agencyId },
   });
@@ -27,11 +37,35 @@ export default async function LaunchPage({ params }: Props) {
     agencyDetails.state &&
     agencyDetails.zipCode;
 
+  const stripeOAuthLink = getStripeOAuthLink(
+    "agency",
+    `launchpad___${agencyDetails.id}`
+  );
+
+  let connectedStripeAccount = false;
+
+  if (searchParams.code) {
+    if (!agencyDetails.connectAccountId) {
+      try {
+        const response = await stripe.oauth.token({
+          grant_type: "authorization_code",
+          code: searchParams.code,
+        });
+        await db.agency.update({
+          where: { id: params.agencyId },
+          data: { connectAccountId: response.stripe_user_id },
+        });
+        connectedStripeAccount = true;
+      } catch (error) {
+        console.log("🔴 Could not connect stripe account");
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="w-full h-full max-w-[800px]">
         <Card className="border-none">
-
           {/* ========== Card Header ========== */}
           <CardHeader>
             <CardTitle>Lets get started!</CardTitle>
@@ -43,7 +77,6 @@ export default async function LaunchPage({ params }: Props) {
           {/* ========== Card Content ========== */}
           <CardContent className="flex flex-col gap-4">
             <div className="flex justify-between items-center w-full border p-4 rounded-lg gap-2">
-
               {/* ========== First Step ========== */}
               <div className="flex md:items-center gap-4 flex-col md:!flex-row">
                 <Image
@@ -73,7 +106,19 @@ export default async function LaunchPage({ params }: Props) {
                   dashboard.
                 </p>
               </div>
-              <Button>Start</Button>
+              {agencyDetails.connectAccountId || connectedStripeAccount ? (
+                <CheckCircleIcon
+                  size={50}
+                  className=" text-primary p-2 flex-shrink-0"
+                />
+              ) : (
+                <Link
+                  className="bg-primary py-2 px-4 rounded-md text-white"
+                  href={stripeOAuthLink}
+                >
+                  Start
+                </Link>
+              )}
             </div>
 
             {/* ========== Agency Details Conformation ========== */}
