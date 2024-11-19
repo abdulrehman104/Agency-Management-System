@@ -100,7 +100,7 @@ export const AgencyForm = ({ data }: Props) => {
   const handleSubmitAgency = async (values: z.infer<typeof formSchema>) => {
     try {
       let newUserData;
-      let CustomerId;
+      let custId;
       if (!data?.id) {
         const bodyData = {
           email: values.companyEmail,
@@ -123,33 +123,47 @@ export const AgencyForm = ({ data }: Props) => {
             state: values.zipCode,
           },
         };
-      }
 
-      // WIP CusId
+        const customerResponse = await fetch("/api/stripe/create-customer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyData),
+        });
+        const customerData: { customerId: string } =
+          await customerResponse.json();
+        custId = customerData.customerId;
+      }
 
       newUserData = await initUser({ role: "AGENCY_OWNER" });
 
-      if (!data?.id) {
-        await upsertAgency({
-          id: data?.id ? data.id : v4(),
-          address: values.address,
-          agencyLogo: values.agencyLogo,
-          city: values.city,
-          companyPhone: values.companyPhone,
-          country: values.country,
-          name: values.name,
-          state: values.state,
-          whiteLabel: values.whiteLabel,
-          zipCode: values.zipCode,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          companyEmail: values.companyEmail,
-          connectAccountId: "",
-          goal: 5,
-        });
+      if (!data?.customerId && !custId) return;
 
-        toast({ title: "Createed Agency" });
-        router.refresh();
+      const response = await upsertAgency({
+        id: data?.id ? data.id : v4(),
+        customerId: data?.customerId || custId || "",
+        address: values.address,
+        agencyLogo: values.agencyLogo,
+        city: values.city,
+        companyPhone: values.companyPhone,
+        country: values.country,
+        name: values.name,
+        state: values.state,
+        whiteLabel: values.whiteLabel,
+        zipCode: values.zipCode,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        companyEmail: values.companyEmail,
+        connectAccountId: "",
+        goal: 5,
+      });
+
+      toast({ title: "Createed Agency" });
+
+      if (data?.id) return router.refresh();
+      if (response) {
+        return router.refresh();
       }
     } catch (error) {
       console.log("Agency Handle Submit Function Error", error);

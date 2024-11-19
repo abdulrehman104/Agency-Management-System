@@ -287,16 +287,6 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
               link: `/agency/${agency.id}/launchpad`,
             },
             {
-              name: "Billing",
-              icon: "payment",
-              link: `/agency/${agency.id}/billing`,
-            },
-            {
-              name: "Settings",
-              icon: "settings",
-              link: `/agency/${agency.id}/settings`,
-            },
-            {
               name: "Sub Accounts",
               icon: "person",
               link: `/agency/${agency.id}/all-subaccounts`,
@@ -305,6 +295,16 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
               name: "Team",
               icon: "shield",
               link: `/agency/${agency.id}/team`,
+            },
+            {
+              name: "Billing",
+              icon: "payment",
+              link: `/agency/${agency.id}/billing`,
+            },
+            {
+              name: "Settings",
+              icon: "settings",
+              link: `/agency/${agency.id}/settings`,
             },
           ],
         },
