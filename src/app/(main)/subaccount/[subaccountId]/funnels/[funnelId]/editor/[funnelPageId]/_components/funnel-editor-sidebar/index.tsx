@@ -8,12 +8,12 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { useEditor } from "@/provider/editor/editor-provider";
-import { TabList } from "./tabs";
 import { SettingsTab } from "./tabs/components-tab/settings-tab";
 import { MediaBucketTab } from "./tabs/components-tab/media-bucket-tab";
-import clsx from "clsx";
 import { ComponentsTab } from "./tabs/components-tab";
+import { TabList } from "./tabs";
+import { useEditor } from "@/provider/editor/editor-provider";
+import clsx from "clsx";
 
 type Props = {
   subaccountId: string;
