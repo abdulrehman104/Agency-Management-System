@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/provider/theme-provider";
 import ModalProvider from "@/provider/modal-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnarToaster } from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,11 +38,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-        {/* ========== Proive custom model to our application ========== */}
+          {/* ========== Proive custom model to our application ========== */}
           <ModalProvider>
             {children}
             <Toaster />
-            {/* <SonnarToaster position="bottom-left" /> */}
+            <SonnarToaster position="bottom-left" />
           </ModalProvider>
         </ThemeProvider>
       </body>
