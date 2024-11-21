@@ -46,7 +46,7 @@ export const pricingCards = [
     duration: "month",
     highlight: "Key features",
     features: ["Rebilling", "24/7 Support team"],
-    priceId: "price_1QMYSmFOvzWnx19JMXWwww94",
+    priceId: "price_1QNdJ2EHj0HLeLI56E2gnQk3",
   },
   {
     title: "Basic",
@@ -55,7 +55,7 @@ export const pricingCards = [
     duration: "month",
     highlight: "Everything in Starter, plus",
     features: ["Unlimited Sub accounts", "Unlimited Team members"],
-    priceId: "price_1QMYSmFOvzWnx19J8Sg1oMdc",
+    priceId: "price_1QNdJ2EHj0HLeLI5CXo74HHY",
   },
 ];
 

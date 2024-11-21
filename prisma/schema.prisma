@@ -370,8 +370,8 @@ model Notification {
 // ====================================================================================================================================================================================================
 // Then we have the pricing plans in our applications and also have a subscription for stripe purpose.
 enum Plan {
-  price_1QMYSmFOvzWnx19J8Sg1oMdc
-  price_1QMYSmFOvzWnx19JMXWwww94
+  price_1QNdJ2EHj0HLeLI5CXo74HHY
+  price_1QNdJ2EHj0HLeLI56E2gnQk3
 }
 
 // ====================================================================================================================================================================================================
