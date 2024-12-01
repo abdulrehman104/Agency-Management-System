@@ -2,6 +2,7 @@
 
 import { clerkClient, currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
+import nodemailer from "nodemailer";
 import { v4 } from "uuid";
 
 import {
@@ -24,10 +25,6 @@ import { revalidatePath } from "next/cache";
 // {/* =============================================== Agency Route Related Queries  =============================================== */}
 
 // {/* ========== verifyAndAcceptInvitation ========== */}
-// This function do many things including:
-// 1. If the user is invited to our agency and the invitation request is PENDING.
-// 2. If the request is PENDING then, it creates a new team user for the agency, & save you activity logs.
-// 3. After that it deletes the invitation to the DB & Returns the agency ID or null if no invitation is found.
 export const verifyAndAcceptInvitation = async () => {
   const user = await currentUser();
   if (!user) return redirect("/sign-in");
@@ -173,13 +170,6 @@ export const saveActivityLogsNotification = async ({
 };
 
 // {/* ========== getAuthUserDetails ========== */}
-// The getAuthUserDetails function retrieves detailed information about the current authenticated user, including:
-
-// User-specific details from the user table.
-// The user's associated Agency and its related Sidebar Options.
-// Any SubAccounts and their Sidebar Options.
-// The user's Permissions.
-
 export const getAuthUserDetails = async () => {
   const user = await currentUser();
   if (!user) {
@@ -209,7 +199,6 @@ export const getAuthUserDetails = async () => {
 };
 
 // {/* ========== updateAgencyDetails ========== */}
-// This updateAgencyDetails function updates the agency details.
 export const updateAgencyDetails = async (
   agencyId: string,
   agencyDetails: Partial<Agency>
@@ -222,8 +211,6 @@ export const updateAgencyDetails = async (
 };
 
 // {/* ========== deleteAgency ========== */}
-// This function delete an existing Agency in the DB.
-
 export const deleteAgency = async (agencyId: string) => {
   const response = await db.agency.delete({
     where: {
@@ -234,7 +221,6 @@ export const deleteAgency = async (agencyId: string) => {
 };
 
 // {/* ========== initUser ========== */}
-// This initUser function create or update the user in our DB and also assign the role according to user role.
 export const initUser = async (newUser: Partial<User>) => {
   const user = await currentUser();
   if (!user) return;
@@ -263,7 +249,6 @@ export const initUser = async (newUser: Partial<User>) => {
 };
 
 // {/* ========== upsertAgency ========== */}
-// THis upsertAgency function create a agency in our DB and also add the SidebarOption for Agency Dashbard.
 export const upsertAgency = async (agency: Agency, price?: Plan) => {
   if (!agency.companyEmail) return null;
   try {
@@ -321,7 +306,6 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
 };
 
 // {/* ========== getNotificationAndUser ========== */}
-// This function get user and all notification in our DB.
 export const getNotificationAndUser = async (agencyId: string) => {
   try {
     const response = await db.notification.findMany({
@@ -338,7 +322,6 @@ export const getNotificationAndUser = async (agencyId: string) => {
 };
 
 // {/* ========== upsertSubAccount ========== */}
-// upsertSubAccount, This function create and update the subaccount in the DB, & also add restriction, only AGENCY_OWNER create a subAccount.
 export const upsertSubAccount = async (subAccount: SubAccount) => {
   if (!subAccount.companyEmail) return null;
 
@@ -515,32 +498,105 @@ export const deleteUser = async (userId: string) => {
 // {/* =============================================== Team Route Actions =============================================== */}
 
 // {/* ========== sendInvitation ========== */}
+// export const sendInvitation = async (
+//   agencyId: string,
+//   email: string,
+//   role: Role
+// ) => {
+//   const resposne = await db.invitation.create({
+//     data: { email, agencyId, role },
+//   });
+
+//   console.log("Data save to the DB");
+
+//   try {
+//     console.log("Data save to the DB");
+//     await clerkClient.invitations.createInvitation({
+//       emailAddress: email,
+//       redirectUrl: process.env.NEXT_PUBLIC_URL,
+//       publicMetadata: {
+//         throughInvitation: true,
+//         role,
+//       },
+//     });
+//   } catch (error) {
+//     console.log("Could not send invitation", error);
+//   }
+
+//   return resposne;
+// };
+
+export const sendEmail = async (
+  to: string,
+  subject: string,
+  text: string,
+  html?: string
+) => {
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.MAILER_EMAIL,
+      pass: process.env.MAILER_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.MAILER_EMAIL, // Always specify the sender's email
+    to,
+    subject,
+    text,
+    html,
+  };
+
+  return { transporter, mailOptions };
+};
+
 export const sendInvitation = async (
   agencyId: string,
+  agencyName: string,
   email: string,
   role: Role
 ) => {
-  const resposne = await db.invitation.create({
-    data: { email, agencyId, role },
-  });
-
-  console.log("Data save to the DB");
-
   try {
-    console.log("Data save to the DB");
-    const invitation = await clerkClient.invitations.createInvitation({
-      emailAddress: email,
-      redirectUrl: process.env.NEXT_PUBLIC_URL,
-      publicMetadata: {
-        // throughInvitation: true,
-        role,
+    // Step 1: Check if an invitation already exists for the given email and agency
+    const existingInvitation = await db.invitation.findFirst({
+      where: {
+        email,
+        agencyId,
       },
     });
-  } catch (error) {
-    console.log("Could not send invitation", error);
-  }
 
-  return resposne;
+    if (existingInvitation) {
+      console.log("🔴 Invitation already exists for this email.");
+      return { message: "Invitation already exists", status: "error" };
+    }
+
+    // Step 2: Create a new invitation in the database
+    const response = await db.invitation.create({
+      data: { email, agencyId, role },
+    });
+
+    // Step 3: Prepare and send the email
+    const { transporter, mailOptions } = await sendEmail(
+      email,
+      "You got an invitation",
+      `You are invited to join ${agencyName} Agency, click accept to confirm.`,
+      `<p>You are invited to join <strong>${agencyName}</strong> Agency. Click the button below to accept the invitation:</p>
+      <a href="${process.env.NEXT_PUBLIC_URL}/agency/${agencyId}" 
+         style="background-color: #000; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px;">
+         Accept Invite
+      </a>`
+    );
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully");
+
+    return response;
+  } catch (error) {
+    console.log("🔴 Could not send invitation:", error);
+  }
 };
 
 // {/* =============================================== SubAccount Route Related Queries  =============================================== */}

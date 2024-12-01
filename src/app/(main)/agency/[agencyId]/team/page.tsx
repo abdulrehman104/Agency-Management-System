@@ -44,7 +44,12 @@ export default async function TeamPage({ params }: Props) {
       data={teamMember}
       columns={columns}
       filterValue="name"
-      modalChildren={<SendInvitationForm agencyId={agencyDetails.id} />}
+      modalChildren={
+        <SendInvitationForm
+          agencyId={agencyDetails.id}
+          agencyName={agencyDetails.name}
+        />
+      }
       actionButtonText={
         <>
           <Plus size={15} /> Add

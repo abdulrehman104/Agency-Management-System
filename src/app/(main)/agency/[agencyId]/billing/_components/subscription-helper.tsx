@@ -43,5 +43,5 @@ export const SubscriptionHelper = ({
       );
   }, [plan]);
 
-  return <div></div>
+  return <div></div>;
 };

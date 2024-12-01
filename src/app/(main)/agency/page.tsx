@@ -10,7 +10,6 @@ const AgencyPage = async ({
 }: {
   searchParams: { plan: Plan; state: string; code: string };
 }) => {
-  
   /* ========== This function is used to check if the current user has a pending invitation associated with their email and, if so, to handle the acceptance of that invitation. ========== */
   const agencyId = await verifyAndAcceptInvitation();
 
@@ -19,13 +18,13 @@ const AgencyPage = async ({
 
   /* ========== Redirect user to route AC to this role  ========== */
   if (agencyId) {
-
     if (user?.role === "SUBACCOUNT_GUEST" || user?.role === "SUBACCOUNT_USER") {
       return redirect("/subaccount");
     } else if (user?.role === "AGENCY_OWNER" || user?.role === "AGENCY_ADMIN") {
-
       if (searchParams.plan) {
-        return redirect(`/agency/${agencyId}/billing?plan=${searchParams.plan}`);
+        return redirect(
+          `/agency/${agencyId}/billing?plan=${searchParams.plan}`
+        );
       }
 
       if (searchParams.state) {
@@ -33,9 +32,10 @@ const AgencyPage = async ({
         const stateAgencyId = searchParams.state.split("___")[1];
 
         if (!stateAgencyId) return <div>Not authorized</div>;
-        return redirect(`/agency/${stateAgencyId}/${statePath}?code=${searchParams.code}`);
-
-      } else return redirect(`/agency/${agencyId}`);
+        return redirect(
+          `/agency/${stateAgencyId}/${statePath}?code=${searchParams.code}`
+        );
+      } else return redirect(`/agency/${agencyId}/billing`);
     } else {
       return <div>Not authorized</div>;
     }

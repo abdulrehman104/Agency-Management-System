@@ -34,9 +34,10 @@ import { saveActivityLogsNotification, sendInvitation } from "@/lib/queries";
 
 type Props = {
   agencyId: string;
+  agencyName: string;
 };
 
-export const SendInvitationForm = ({ agencyId }: Props) => {
+export const SendInvitationForm = ({ agencyId, agencyName }: Props) => {
   const { toast } = useToast();
 
   const formSchema = z.object({
@@ -53,32 +54,38 @@ export const SendInvitationForm = ({ agencyId }: Props) => {
     },
   });
 
-  {/* ========== Form Submission Functionality ========== */}
+  {
+    /* ========== Form Submission Functionality ========== */
+  }
   const handleOnSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const res = await sendInvitation(agencyId, values.email, values.role)
+      const res = await sendInvitation(
+        agencyId,
+        agencyName,
+        values.email,
+        values.role
+      );
 
       await saveActivityLogsNotification({
         agencyId: agencyId,
         description: `Invited ${res.email}`,
         subaccountId: undefined,
-      })
+      });
 
       toast({
-        title: 'Success',
-        description: 'Created and sent invitation',
-      })
-
+        title: "Success",
+        description: "Created and sent invitation",
+      });
     } catch (error) {
-      console.log(error)
-      
+      console.log(error);
+
       toast({
-        variant: 'destructive',
-        title: 'Oppse!',
-        description: 'Could not send invitation',
-      })
+        variant: "destructive",
+        title: "Oppse!",
+        description: "Could not send invitation",
+      });
     }
-  }
+  };
 
   return (
     <Card>
@@ -99,8 +106,7 @@ export const SendInvitationForm = ({ agencyId }: Props) => {
             onSubmit={form.handleSubmit(handleOnSubmit)}
             className="space-y-8"
           >
-
-      {/* ========== Email Form ========== */}
+            {/* ========== Email Form ========== */}
             <FormField
               disabled={form.formState.isSubmitting}
               control={form.control}
@@ -116,7 +122,7 @@ export const SendInvitationForm = ({ agencyId }: Props) => {
               )}
             />
 
-      {/* ========== Invited User Role Form ========== */}
+            {/* ========== Invited User Role Form ========== */}
             <FormField
               disabled={form.formState.isSubmitting}
               control={form.control}
@@ -135,8 +141,12 @@ export const SendInvitationForm = ({ agencyId }: Props) => {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="AGENCY_ADMIN">Agency Admin</SelectItem>
-                      <SelectItem value="SUBACCOUNT_USER">Sub Account User</SelectItem>
-                      <SelectItem value="SUBACCOUNT_GUEST">Sub Account Guest</SelectItem>
+                      <SelectItem value="SUBACCOUNT_USER">
+                        Sub Account User
+                      </SelectItem>
+                      <SelectItem value="SUBACCOUNT_GUEST">
+                        Sub Account Guest
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -144,7 +154,7 @@ export const SendInvitationForm = ({ agencyId }: Props) => {
               )}
             />
 
-      {/* ========== Submit Button ========== */}
+            {/* ========== Submit Button ========== */}
             <Button disabled={form.formState.isSubmitting} type="submit">
               {form.formState.isSubmitting ? <Loading /> : "Send Invitation"}
             </Button>

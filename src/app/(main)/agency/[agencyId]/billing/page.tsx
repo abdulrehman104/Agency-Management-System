@@ -80,7 +80,7 @@ export default async function BillingPage({ params }: Props) {
           customerId={agencySubscription?.customerId || ""}
           amt={
             agencySubscription?.Subscription?.active === true
-              ? currentPlanDetails?.price || "$0"
+              ? `$${agencySubscription?.Subscription?.price}`
               : "$0"
           }
           buttonCta={
