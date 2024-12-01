@@ -68,6 +68,7 @@ export const SendInvitationForm = ({ agencyId, agencyName }: Props) => {
 
       await saveActivityLogsNotification({
         agencyId: agencyId,
+        //@ts-ignore
         description: `Invited ${res.email}`,
         subaccountId: undefined,
       });
